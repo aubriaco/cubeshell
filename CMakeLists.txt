@@ -1,0 +1,2 @@
+
+include("core/CMakeLists.txt")
