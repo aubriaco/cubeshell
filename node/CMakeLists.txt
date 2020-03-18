@@ -22,4 +22,4 @@ add_executable(${PROJECT_NAME} ${SRCS})
 
 include_directories(${PROJECT_NAME} "${CMAKE_SOURCE_DIR}/include/")
 
-target_link_libraries(${PROJECT_NAME} ssl crypto solunet pthread)
+target_link_libraries(${PROJECT_NAME} ssl crypto solunet pthread shellcubedb mongoc-1.0)

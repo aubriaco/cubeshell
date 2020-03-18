@@ -12,16 +12,16 @@ add_compile_options(-fPIC -O2 -w)
 
 
 ## Use all the *.cpp files we found under this folder for the project
-FILE(GLOB SRCS "src/*.cpp")
+FILE(GLOB SRCS "libshellcubedb/src/*.cpp")
 
 
 #set(CMAKE_VERBOSE_MAKEFILE ON)
 ## Define the executable
 add_library(${PROJECT_NAME} SHARED ${SRCS})
 
-include_directories(${PROJECT_NAME} "${CMAKE_SOURCE_DIR}/include/")
+include_directories(${PROJECT_NAME} "libshellcubedb/include/" /usr/local/include/libmongoc-1.0 "/usr/local/include/libbson-1.0")
 
-target_link_libraries(${PROJECT_NAME} ssl crypto solunet)
+target_link_libraries(${PROJECT_NAME} ssl crypto mongoc-1.0)
 
 install(TARGETS ${PROJECT_NAME}
         LIBRARY
