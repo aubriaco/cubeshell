@@ -3,5 +3,14 @@
   "db":
   {
     "connection_string": "mongodb://localhost:27017"
+  },
+  "certificate":
+  {
+    "path": "../certs/node.pem",
+    "password": "1234"
+  },
+  "global":
+  {
+    "port": 5811
   }
 }

@@ -18,7 +18,7 @@ void interruptCallback(int sig)
   printf("Interrupt signal called.\n");
   g_Stop = true;
   solunet::ISocket *socket = solunet::createSocket(false);
-  socket->connect("127.0.0.1",5811);
+  socket->connect("127.0.0.1",Config->get("global/port").getInt());
   int action = -1;
   socket->writeBuffer(&action, 4);
   socket->dispose();
@@ -88,12 +88,13 @@ int main(int argc, char *argv[])
     return 1;
   }
 
+  std::string cert(Config->get("certificate/path").getString());
   solunet::ISocket *socket = solunet::createSocket(true);
-  socket->setSSLCertificatePassword("1234");
-  socket->setSSLCertificate("../certs/node.pem");
-  socket->setSSLPrivateKeyFile("../certs/node.pem");
+  socket->setSSLCertificatePassword(Config->get("certificate/password").getString().c_str());
+  socket->setSSLCertificate(cert.c_str());
+  socket->setSSLPrivateKeyFile(cert.c_str());
   socket->setSSLMutual(true);
-  socket->bind(5811);
+  socket->bind(Config->get("global/port").getInt());
   socket->listen();
 
   scanNodes();

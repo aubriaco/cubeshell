@@ -50,15 +50,15 @@ MConfigVar CConfig::getFromValue(rapidjson::Value &v, const std::string& name)
   return MConfigVar("__NULL__");
 }
 
-MConfigVar CConfig::get(std::string path)
+MConfigVar& CConfig::get(std::string path)
 {
   if(!D.IsObject())
-    return MConfigVar("__NULL__");
-  if(Dict.count(path) > 0)
   {
-    fprintf(stdout, "Using dict.\n");
+    Dict[path] = MConfigVar("__NULL__");
     return Dict[path];
   }
+  if(Dict.count(path) > 0)
+    return Dict[path];
   std::string dpath(path);
   size_t n = path.find('/');
   rapidjson::Document d;
@@ -75,6 +75,6 @@ MConfigVar CConfig::get(std::string path)
   }
   MConfigVar mcv = getFromValue(v, path);
   Dict[dpath] = mcv;
-  return mcv;
+  return Dict[dpath];
 }
 }

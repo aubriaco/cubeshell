@@ -16,7 +16,7 @@ namespace cubeshell
   public:
     CConfig(const std::string &fn);
     ~CConfig();
-    MConfigVar get(std::string path);
+    MConfigVar& get(std::string path);
     bool isValid();
   };
 }

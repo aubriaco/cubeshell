@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 ## Use the variable PROJECT_NAME for changing the target name
-set( PROJECT_NAME "shellcube-core" )
+set( PROJECT_NAME "cubeshell-cli" )
 
 ## Set our project name
 project(${PROJECT_NAME})
@@ -13,19 +13,13 @@ add_definitions(-DUSE_OPENSSL)
 
 
 ## Use all the *.cpp files we found under this folder for the project
-FILE(GLOB SRCS "src/*.cpp")
+FILE(GLOB SRCS "cli/src/*.cpp")
 
 
 #set(CMAKE_VERBOSE_MAKEFILE ON)
 ## Define the executable
-add_library(${PROJECT_NAME} SHARED ${SRCS})
+add_executable(${PROJECT_NAME} ${SRCS})
 
 include_directories(${PROJECT_NAME} "${CMAKE_SOURCE_DIR}/include/")
 
-target_link_libraries(${PROJECT_NAME} ssl crypto solunet)
-
-install(TARGETS ${PROJECT_NAME}
-        LIBRARY
-          DESTINATION /usr/local/lib
-          COMPONENT Libraries)
-install(DIRECTORY include/ DESTINATION /usr/local/include)
+target_link_libraries(${PROJECT_NAME} ssl crypto solunet pthread cubeshellconfig)
