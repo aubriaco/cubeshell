@@ -1,8 +1,10 @@
 #include <solunet.h>
 #include <signal.h>
 #include <unistd.h>
+#include <shellcubedb.h>
 
 static bool g_Stop = false;
+static shellcube::IDatabase *DB = 0;
 
 void interruptCallback(int sig)
 {
@@ -30,6 +32,11 @@ void* node(void *param)
   return 0;
 }
 
+void connection()
+{
+
+}
+
 int main(int argc, char *argv[])
 {
   fprintf(stdout, "=======================================================\n");
@@ -49,8 +56,10 @@ int main(int argc, char *argv[])
   socket->setSSLMutual(true);
   socket->bind(5811);
   socket->listen();
+	fprintf(stdout, "Initialized! Listening...\n");
 
-  fprintf(stdout, "Initialized! Listening...\n");
+	connection();
+
 
   pthread_attr_t attr;
   pthread_attr_init(&attr);
