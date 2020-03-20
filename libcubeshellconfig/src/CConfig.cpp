@@ -38,12 +38,15 @@ bool CConfig::isValid()
 
 MConfigVar CConfig::getFromValue(rapidjson::Value &v, const std::string& name)
 {
-  if(v.IsString())
-    return MConfigVar(v.GetString());
-  else if(v.IsInt())
-    return MConfigVar(v.GetInt());
-  else if(v.IsDouble())
-    return MConfigVar(v.GetDouble());
+  if(v.HasMember(name.c_str()))
+  {
+    if(v[name.c_str()].IsString())
+      return MConfigVar(v[name.c_str()].GetString());
+    else if(v[name.c_str()].IsInt())
+      return MConfigVar(v[name.c_str()].GetInt());
+    else if(v[name.c_str()].IsDouble())
+      return MConfigVar(v[name.c_str()].GetDouble());
+  }
   return MConfigVar("__NULL__");
 }
 
@@ -52,14 +55,17 @@ MConfigVar CConfig::get(std::string path)
   if(!D.IsObject())
     return MConfigVar("__NULL__");
   size_t n = path.find('/');
-  rapidjson::Value v = D.GetObject();
-  if(n != std::string::npos)
+  rapidjson::Document d;
+  d.CopyFrom(D, d.GetAllocator());
+  rapidjson::Value v = d.GetObject();
+  while(n != std::string::npos)
   {
     std::string p = path.substr(0, n);
     path = path.substr(n+1);
 
     if(v.IsObject() && v[p.c_str()].IsObject())
       v = v[p.c_str()].GetObject();
+    n = path.find('/');
   }
   return getFromValue(v, path);
 }
