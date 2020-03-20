@@ -39,11 +39,19 @@ void* node(void *param)
 {
   fprintf(stdout, "Node connection.\n");
   solunet::ISocket *socket = (solunet::ISocket*)param;
-  while(!g_Stop)
+  socket->setThrowExceptions(true);
+  try
   {
-    int action = 0;
-    socket->writeBuffer(&action, 4);
-    socket->readBuffer(&action, 4);
+    while(!g_Stop)
+    {
+      int action = 0;
+      socket->writeBuffer(&action, 4);
+      socket->readBuffer(&action, 4);
+    }
+  }
+  catch(int e)
+  {
+    fprintf(stderr, "Socket exception: %i\n", e);
   }
   socket->dispose();
   fprintf(stdout, "Node exit.\n");

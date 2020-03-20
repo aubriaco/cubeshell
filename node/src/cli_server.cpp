@@ -20,13 +20,15 @@ int cli_cmd(IDatabase *db, std::string s)
 
   fprintf(stdout, "Param count: %lu\n", p.size());
 
-
+  return -1;
 }
 
 std::string readLString(solunet::ISocket *socket)
 {
   size_t len = 0;
   socket->readBuffer(&len, 8);
+  if(len == 0)
+    return std::string();
   if(len > SN_MAX_LEN)
   {
     fprintf(stderr, "Length of command too long...\n");
@@ -43,17 +45,17 @@ std::string readLString(solunet::ISocket *socket)
 void *cli_server(void* param)
 {
   solunet::ISocket *socket = (solunet::ISocket*)param;
-
+  socket->setThrowExceptions(true);
   IDatabase *db = createDatabase();
   db->setConnectionString(getConfig()->get("db/connection_string").getString());
 
   fprintf(stdout, "Enter cli.\n");
 
   bool loggedIn = false;
-  socket->setTimeout(30000);
+  socket->setTimeout(5000);
   try
   {
-    while(!isStopped)
+    while(!isStopped())
     {
 
       int action = 0;
@@ -64,14 +66,18 @@ void *cli_server(void* param)
         fprintf(stdout, "Username: %s\n", username.c_str());
         std::string password(readLString(socket));
 
+
+        int r = 0;
+        socket->writeBuffer(&r, 4);
+        loggedIn = true;
+        fprintf(stdout, "Logged in.\n");
       }
       else if(action == 2)
       {
         if(!loggedIn)
         {
           fprintf(stderr, "Not logged in closing...\n");
-          socket->dispose();
-          return 0;
+          break;
         }
 
         std::string s(readLString(socket));
@@ -97,7 +103,9 @@ void *cli_listener(void *param)
   std::string cert(getConfig()->get("certificate/path").getString());
   std::string pwd(getConfig()->get("certificate/password").getString());
   solunet::ISocket *socket = solunet::createSocket(true);
+  socket->setSSLCertificatePassword(pwd.c_str());
   socket->setSSLCertificate(cert.c_str());
+  socket->setSSLPrivateKeyFile(cert.c_str());
   socket->setSSLMutual(false);
 
   socket->bind(getConfig()->get("global/cli_port").getInt());
