@@ -2,7 +2,7 @@
 #define __M_CONFIG_VAR_INCLUDED__
 #include <string>
 
-namespace shellcube
+namespace cubeshell
 {
   class MConfigVar
   {

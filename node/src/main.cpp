@@ -1,10 +1,10 @@
 #include <solunet.h>
 #include <signal.h>
 #include <unistd.h>
-#include <shellcubedb.h>
+#include <cubeshelldb.h>
 
 static bool g_Stop = false;
-static shellcube::IDatabase *DB = 0;
+static cubeshell::IDatabase *DB = 0;
 
 void interruptCallback(int sig)
 {

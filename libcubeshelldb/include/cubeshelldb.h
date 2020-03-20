@@ -1,7 +1,8 @@
 #ifndef __SHELLCUBEDB_INCLUDED__
 #define __SHELLCUBEDB_INCLUDED__
+#include "cubeshelldb/IDatabase.h"
 
-namespace shellcube
+namespace cubeshell
 {
   IDatabase *createDatabase();
 }

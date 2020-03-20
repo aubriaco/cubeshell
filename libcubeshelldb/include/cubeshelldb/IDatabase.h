@@ -1,7 +1,8 @@
 #ifndef __I_DATABASE_INCLUDED__
 #define __I_DATABASE_INCLUDED__
 #include <string>
-
+namespace cubeshell
+{
 class IDatabase
 {
 public:
@@ -10,5 +11,5 @@ public:
   virtual void open() = 0;
   virtual void close() = 0;
 };
-
+}
 #endif

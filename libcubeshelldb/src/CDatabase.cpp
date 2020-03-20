@@ -1,5 +1,6 @@
 #include "CDatabase.h"
-
+namespace cubeshell
+{
 static size_t DBC = 0;
 
 CDatabase::CDatabase()
@@ -49,4 +50,5 @@ void CDatabase::close()
     mongoc_client_destroy(Client);
     Client = 0;
   }
+}
 }

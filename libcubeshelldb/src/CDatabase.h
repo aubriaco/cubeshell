@@ -1,8 +1,9 @@
 #ifndef __C_DATABASE_INCLUDED__
 #define __C_DATABASE_INCLUDED__
-#include <shellcubedb/IDatabase.h>
+#include <cubeshelldb/IDatabase.h>
 #include <mongoc/mongoc.h>
-
+namespace cubeshell
+{
 class CDatabase
 {
 private:
@@ -17,5 +18,5 @@ public:
   void open();
   void close();
 };
-
+}
 #endif

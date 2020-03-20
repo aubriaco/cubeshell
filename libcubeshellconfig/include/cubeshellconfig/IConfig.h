@@ -3,7 +3,7 @@
 #include <string>
 #include "MConfigVar.h"
 
-namespace shellcube
+namespace cubeshell
 {
   class IConfig
   {

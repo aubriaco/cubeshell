@@ -1,5 +1,6 @@
-#include <CConfig.h>
-
+#include "CConfig.h"
+namespace cubeshell
+{
 std::string readTextFile(const std::string& fname)
 {
   FILE* file = fopen(fname.c_str(), "r");
@@ -22,7 +23,7 @@ CConfig::CConfig(const std::string &fn)
 {
   std::string body = readTextFile(fn);
   if(body.size() > 0)
-    D.Parse(body);
+    D.Parse(body.c_str());
 }
 
 CConfig::~CConfig()
@@ -38,4 +39,5 @@ bool CConfig::isValid()
 MConfigVar CConfig::get(const std::string& path)
 {
 
+}
 }
