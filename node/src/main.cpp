@@ -12,7 +12,7 @@ static IDatabase *DB = 0;
 
 void interruptCallback(int sig)
 {
-	printf("Interrupt signal called.\n");
+  printf("Interrupt signal called.\n");
   g_Stop = true;
   solunet::ISocket *socket = solunet::createSocket(false);
   socket->connect("127.0.0.1",5811);
@@ -38,9 +38,9 @@ void* node(void *param)
 
 void configure()
 {
-	Config = createConfig("../conf/node.json");
-	DB = createDatabase();
-	DB->setConnectionString(Config->get("db/connection_string").getString());
+  Config = createConfig("../conf/node.json");
+  DB = createDatabase();
+  DB->setConnectionString(Config->get("db/connection_string").getString());
 }
 
 int main(int argc, char *argv[])
@@ -55,14 +55,14 @@ int main(int argc, char *argv[])
   sigIntHandler.sa_flags = 0;
   sigaction(SIGINT, &sigIntHandler, NULL);
 
-	configure();
-	fprintf(stdout, "Configured!\n");
+  configure();
+  fprintf(stdout, "Configured!\n");
 
-	if(!DB->open())
-	{
-		fprintf(stderr, "Failed to connect to database.\n");
-		return 1;
-	}
+  if(!DB->open())
+  {
+    fprintf(stderr, "Failed to connect to database.\n");
+    return 1;
+  }
 
   solunet::ISocket *socket = solunet::createSocket(true);
   socket->setSSLCertificatePassword("1234");
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 
 
 
-	fprintf(stdout, "Initialized! Listening...\n");
+  fprintf(stdout, "Initialized! Listening...\n");
 
 
   pthread_attr_t attr;
