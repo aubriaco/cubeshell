@@ -3,12 +3,15 @@
 #include <unistd.h>
 #include <cubeshellconfig.h>
 #include <cubeshelldb.h>
+#include <rapidjson/document.h>
+#include "MNode.h"
 
 using namespace cubeshell;
 
 static bool g_Stop = false;
 static IConfig *Config = 0;
 static IDatabase *DB = 0;
+static std::vector<MNode> Nodes;
 
 void interruptCallback(int sig)
 {
@@ -43,6 +46,27 @@ void configure()
   DB->setConnectionString(Config->get("db/connection_string").getString());
 }
 
+void scanNodes()
+{
+  fprintf(stdout, "Scanning nodes...\n");
+  DB->open();
+  basicdoc_t doc = DB->basicFind("shellcube", "nodes");
+  for(basicdoc_t::iterator it = doc.begin(); it != doc.end(); ++it)
+  {
+    MNode node;
+    node.Name = (*it)["name"];
+    node.Host = (*it)["host"];
+    fprintf(stdout, "Found Node: %s | Host: %s\n", node.Name.c_str(), node.Host.c_str());
+    if(node.Name == Config->get("name").getString())
+    {
+      node.Self = true;
+      fprintf(stdout, "Thats me!\n");
+    }
+    Nodes.push_back(node);
+  }
+  DB->close();
+}
+
 int main(int argc, char *argv[])
 {
   fprintf(stdout, "=======================================================\n");
@@ -72,7 +96,7 @@ int main(int argc, char *argv[])
   socket->bind(5811);
   socket->listen();
 
-
+  scanNodes();
 
   fprintf(stdout, "Initialized! Listening...\n");
 

@@ -1,4 +1,5 @@
 {
+  "name": "Node1",
   "db":
   {
     "connection_string": "mongodb://localhost:27017"

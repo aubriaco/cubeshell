@@ -1,4 +1,6 @@
 #include "CDatabase.h"
+#include <rapidjson/document.h>
+
 namespace cubeshell
 {
   static size_t DBC = 0;
@@ -56,6 +58,34 @@ namespace cubeshell
     }
 
     return true;
+  }
+
+  basicdoc_t CDatabase::basicFind(const std::string& dbname, const std::string& collname)
+  {
+    basicdoc_t m;
+    const bson_t *doc;
+    mongoc_collection_t *collection = mongoc_client_get_collection(Client, dbname.c_str(), collname.c_str());
+    bson_t *query = bson_new();
+    mongoc_cursor_t *cursor = mongoc_collection_find_with_opts(collection, query, 0, 0);
+    while (mongoc_cursor_next(cursor, &doc))
+    {
+       std::map<std::string, std::string> a;
+       char *str = bson_as_canonical_extended_json(doc, 0);
+       rapidjson::Document doc;
+       doc.Parse(str);
+       for (rapidjson::Value::ConstMemberIterator p = doc.MemberBegin(); p != doc.MemberEnd(); ++p)
+       {
+         if(p->value.IsString())
+          a[p->name.GetString()] = p->value.GetString();
+       }
+       bson_free(str);
+       m.push_back(a);
+    }
+
+    bson_destroy(query);
+    mongoc_cursor_destroy(cursor);
+    mongoc_collection_destroy(collection);
+    return m;
   }
 
   void CDatabase::close()
