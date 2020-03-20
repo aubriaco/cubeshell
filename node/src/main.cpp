@@ -1,10 +1,11 @@
 #include <solunet.h>
 #include <signal.h>
 #include <unistd.h>
-#include <cubeshellconfig.h>
 #include <cubeshelldb.h>
+#include <cubeshellconfig.h>
 #include <rapidjson/document.h>
 #include "MNode.h"
+#include "cli_server.h"
 
 using namespace cubeshell;
 
@@ -12,6 +13,16 @@ static bool g_Stop = false;
 static IConfig *Config = 0;
 static IDatabase *DB = 0;
 static std::vector<MNode> Nodes;
+
+bool isStopped()
+{
+  return g_Stop;
+}
+
+IConfig *getConfig()
+{
+  return Config;
+}
 
 void interruptCallback(int sig)
 {
@@ -67,6 +78,7 @@ void scanNodes()
   DB->close();
 }
 
+
 int main(int argc, char *argv[])
 {
   fprintf(stdout, "=======================================================\n");
@@ -89,8 +101,9 @@ int main(int argc, char *argv[])
   }
 
   std::string cert(Config->get("certificate/path").getString());
+  std::string pwd(Config->get("certificate/password").getString());
   solunet::ISocket *socket = solunet::createSocket(true);
-  socket->setSSLCertificatePassword(Config->get("certificate/password").getString().c_str());
+  socket->setSSLCertificatePassword(pwd.c_str());
   socket->setSSLCertificate(cert.c_str());
   socket->setSSLPrivateKeyFile(cert.c_str());
   socket->setSSLMutual(true);
@@ -105,10 +118,12 @@ int main(int argc, char *argv[])
   pthread_attr_t attr;
   pthread_attr_init(&attr);
   pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+  pthread_t threadId = 0;
+  pthread_create(&threadId, &attr, cli_listener, 0);
   while(!g_Stop)
   {
     solunet::ISocket *s = socket->accept();
-    pthread_t threadId = 0;
     pthread_create(&threadId, &attr, node, s);
   }
 
