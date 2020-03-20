@@ -15,7 +15,7 @@ public:
   ~CDatabase();
   void setConnectionString(const std::string& cs);
   void setDatabaseName(const std::string& name);
-  void open();
+  bool open();
   void close();
 };
 }

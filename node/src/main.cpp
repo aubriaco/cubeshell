@@ -41,7 +41,6 @@ void configure()
 	Config = createConfig("../conf/node.json");
 	DB = createDatabase();
 	DB->setConnectionString(Config->get("db/connection_string").getString());
-	fprintf(stdout, "Connection string set %s\n", Config->get("db/connection_string").getString().c_str());
 }
 
 int main(int argc, char *argv[])
@@ -56,6 +55,15 @@ int main(int argc, char *argv[])
   sigIntHandler.sa_flags = 0;
   sigaction(SIGINT, &sigIntHandler, NULL);
 
+	configure();
+	fprintf(stdout, "Configured!\n");
+
+	if(!DB->open())
+	{
+		fprintf(stderr, "Failed to connect to database.\n");
+		return 1;
+	}
+
   solunet::ISocket *socket = solunet::createSocket(true);
   socket->setSSLCertificatePassword("1234");
   socket->setSSLCertificate("../certs/node.pem");
@@ -63,9 +71,10 @@ int main(int argc, char *argv[])
   socket->setSSLMutual(true);
   socket->bind(5811);
   socket->listen();
-	fprintf(stdout, "Initialized! Listening...\n");
 
-	configure();
+
+
+	fprintf(stdout, "Initialized! Listening...\n");
 
 
   pthread_attr_t attr;
