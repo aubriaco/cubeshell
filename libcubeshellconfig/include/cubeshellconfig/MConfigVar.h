@@ -11,9 +11,13 @@ namespace cubeshell
     int I;
     double D;
   public:
+    MConfigVar(const std::string& v) { S = v; }
+    MConfigVar(int v) { I = v; S = std::to_string(I); }
+    MConfigVar(double v) { D = v; S = std::to_string(D); }
     std::string getString() { return S; }
     int getInt() { return I; }
     double getDouble() { return D; }
+    bool isNull() { return S == "__NULL__"; }
   };
 }
 

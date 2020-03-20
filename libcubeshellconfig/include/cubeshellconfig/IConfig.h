@@ -8,7 +8,7 @@ namespace cubeshell
   class IConfig
   {
   public:
-    virtual MConfigVar get(const std::string& path) = 0;
+    virtual MConfigVar get(std::string path) = 0;
     virtual bool isValid() = 0;
   };
 }

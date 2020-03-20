@@ -10,10 +10,11 @@ namespace cubeshell
   {
   protected:
     rapidjson::Document D;
+    MConfigVar getFromValue(rapidjson::Value &v, const std::string& name);
   public:
     CConfig(const std::string &fn);
     ~CConfig();
-    MConfigVar get(const std::string& path);
+    MConfigVar get(std::string path);
     bool isValid();
   };
 }

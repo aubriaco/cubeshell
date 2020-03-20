@@ -4,7 +4,7 @@
 #include <mongoc/mongoc.h>
 namespace cubeshell
 {
-class CDatabase
+class CDatabase : public IDatabase
 {
 private:
   std::string ConnectionString, DBName;

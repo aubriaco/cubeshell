@@ -1,10 +1,14 @@
 #include <solunet.h>
 #include <signal.h>
 #include <unistd.h>
+#include <cubeshellconfig.h>
 #include <cubeshelldb.h>
 
+using namespace cubeshell;
+
 static bool g_Stop = false;
-static cubeshell::IDatabase *DB = 0;
+static IConfig *Config = 0;
+static IDatabase *DB = 0;
 
 void interruptCallback(int sig)
 {
@@ -32,9 +36,12 @@ void* node(void *param)
   return 0;
 }
 
-void connection()
+void configure()
 {
-
+	Config = createConfig("../conf/node.json");
+	DB = createDatabase();
+	DB->setConnectionString(Config->get("db/connection_string").getString());
+	fprintf(stdout, "Connection string set %s\n", Config->get("db/connection_string").getString().c_str());
 }
 
 int main(int argc, char *argv[])
@@ -58,7 +65,7 @@ int main(int argc, char *argv[])
   socket->listen();
 	fprintf(stdout, "Initialized! Listening...\n");
 
-	connection();
+	configure();
 
 
   pthread_attr_t attr;
