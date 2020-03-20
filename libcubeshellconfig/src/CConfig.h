@@ -3,12 +3,14 @@
 #include <cubeshellconfig/IConfig.h>
 #include <rapidjson/document.h>
 #include <string>
+#include <map>
 
 namespace cubeshell
 {
   class CConfig : public IConfig
   {
   protected:
+    std::map<std::string, MConfigVar> Dict;
     rapidjson::Document D;
     MConfigVar getFromValue(rapidjson::Value &v, const std::string& name);
   public:

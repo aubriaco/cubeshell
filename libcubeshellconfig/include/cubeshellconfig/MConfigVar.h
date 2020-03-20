@@ -11,6 +11,7 @@ namespace cubeshell
     int I;
     double D;
   public:
+    MConfigVar() { S = "__NULL__"; }
     MConfigVar(const std::string& v) { S = v; }
     MConfigVar(int v) { I = v; S = std::to_string(I); }
     MConfigVar(double v) { D = v; S = std::to_string(D); }
