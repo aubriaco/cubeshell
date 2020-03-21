@@ -8,7 +8,7 @@ using namespace cubeshell;
 
 std::string sha256_string(const std::string &s)
 {
-  char outputBuffer[65];
+  char outputBuffer[64];
   unsigned char hash[SHA256_DIGEST_LENGTH];
   SHA256_CTX sha256;
   SHA256_Init(&sha256);
@@ -17,7 +17,7 @@ std::string sha256_string(const std::string &s)
   int i = 0;
   for(i = 0; i < SHA256_DIGEST_LENGTH; i++)
   {
-    sprintf(outputBuffer + (i * 2), "%02x", hash[i]);
+    sprintf(outputBuffer + (i * 2), "%02x", (int)hash[i]);
   }
   outputBuffer[64] = 0;
   return outputBuffer;

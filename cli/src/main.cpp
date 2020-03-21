@@ -72,13 +72,15 @@ int main(int argc, char *argv[])
         if(i >= 127)
           break;
     }
+    i++;
   } while (c != '\n');
   if(g_Stop)
     return 2;
+  i++;
+  buf[i] = 0;
   password = buf;
   fprintf(stdout, "\n");
   tcsetattr(fileno(stdin), TCSANOW, &g_DefaultTerm);
-
   fprintf(stdout, "Connecting to: %s\n", host.c_str());
 
   if(!socket->connect(host.c_str(), std::stoi(port)))
