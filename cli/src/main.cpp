@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
     action = 2;
     while(!g_Stop)
     {
-      fprintf(stdout, "> ");
+      fprintf(stdout, "cubeshell> ");
       fgets(buf, 128, stdin);
       std::string s(buf);
       if(s == "exit")
