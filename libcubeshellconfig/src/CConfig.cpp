@@ -77,4 +77,9 @@ namespace cubeshell
     Dict[dpath] = mcv;
     return Dict[dpath];
   }
+
+  void CConfig::dispose()
+  {
+    delete this;
+  }
 }

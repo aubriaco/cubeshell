@@ -35,7 +35,8 @@ std::string readLString(solunet::ISocket *socket)
     throw 99;
   }
   char *buf = new char[len];
-  socket->readBuffer(buf, len);
+  size_t r = socket->readBuffer(buf, len);
+  buf[r] = 0;
   std::string s(buf);
   delete[] buf;
 
@@ -48,7 +49,7 @@ void *cli_server(void* param)
   socket->setThrowExceptions(true);
   IDatabase *db = createDatabase();
   db->setConnectionString(getConfig()->get("db/connection_string").getString());
-
+  db->open();
   fprintf(stdout, "Enter cli.\n");
 
   bool loggedIn = false;
@@ -66,11 +67,25 @@ void *cli_server(void* param)
         fprintf(stdout, "Username: %s\n", username.c_str());
         std::string password(readLString(socket));
 
+        basicfilter_t filter;
+        filter["username"] = username;
 
-        int r = 0;
-        socket->writeBuffer(&r, 4);
-        loggedIn = true;
-        fprintf(stdout, "Logged in.\n");
+        basicdoc_t u = db->basicFind("cubeshell", "users", filter);
+
+        if(u.size() > 0)
+        {
+          int r = 0;
+          socket->writeBuffer(&r, 4);
+          loggedIn = true;
+          fprintf(stdout, "Logged in.\n");
+        }
+
+        if(!loggedIn)
+        {
+          fprintf(stdout, "Failed to log in.\n");
+          int r = 1;
+          socket->writeBuffer(&r, 4);
+        }
       }
       else if(action == 2)
       {
@@ -94,6 +109,7 @@ void *cli_server(void* param)
   }
 
   fprintf(stdout, "Exit cli.\n");
+  db->dispose();
   socket->dispose();
   return 0;
 }

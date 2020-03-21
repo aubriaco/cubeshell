@@ -5,7 +5,8 @@
 #include <map>
 namespace cubeshell
 {
-  typedef std::vector< std::map<std::string, std::string> > basicdoc_t;
+  typedef std::map<std::string, std::string> basicfilter_t;
+  typedef std::vector< basicfilter_t > basicdoc_t;
 
   class IDatabase
   {
@@ -14,7 +15,8 @@ namespace cubeshell
     virtual void setDatabaseName(const std::string& name) = 0;
     virtual bool open() = 0;
     virtual void close() = 0;
-    virtual basicdoc_t basicFind(const std::string& dbname, const std::string& collname) = 0;
+    virtual basicdoc_t basicFind(const std::string& dbname, const std::string& collname, basicfilter_t filter = basicfilter_t()) = 0;
+    virtual void dispose() = 0;
   };
 }
 #endif

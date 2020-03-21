@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
   term = g_DefaultTerm;
   term.c_lflag &= ~ECHO;
   tcsetattr(fileno(stdin), TCSANOW, &term);
-
+  fprintf(stdout, "Username: %s\n", username.c_str());
   fprintf(stdout, "Password: ");
   int i = 0;
   char c = 0;
@@ -113,6 +113,8 @@ int main(int argc, char *argv[])
       fprintf(stdout, "cubeshell> ");
       fgets(buf, 128, stdin);
       std::string s(buf);
+      if(s.size() > 0)
+        s = s.substr(0, s.size()-1);
       if(s == "exit")
         break;
       socket->writeBuffer(&action, 4);

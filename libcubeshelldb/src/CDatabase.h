@@ -18,7 +18,8 @@ namespace cubeshell
     void setDatabaseName(const std::string& name);
     bool open();
     void close();
-    basicdoc_t basicFind(const std::string& dbname, const std::string& collname);
+    basicdoc_t basicFind(const std::string& dbname, const std::string& collname, basicfilter_t filter = basicfilter_t());
+    void dispose();
   };
 }
 #endif

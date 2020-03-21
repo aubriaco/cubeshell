@@ -69,7 +69,7 @@ void scanNodes()
 {
   fprintf(stdout, "Scanning nodes...\n");
   DB->open();
-  basicdoc_t doc = DB->basicFind("shellcube", "nodes");
+  basicdoc_t doc = DB->basicFind("cubeshell", "nodes");
   for(basicdoc_t::iterator it = doc.begin(); it != doc.end(); ++it)
   {
     MNode node;
@@ -90,7 +90,7 @@ void scanNodes()
 int main(int argc, char *argv[])
 {
   fprintf(stdout, "=======================================================\n");
-  fprintf(stdout, "SHELLCUBE NODE\n");
+  fprintf(stdout, "CUBESHELL NODE\n");
   fprintf(stdout, "=======================================================\n");
 
   struct sigaction sigIntHandler;
@@ -136,5 +136,7 @@ int main(int argc, char *argv[])
   }
 
   socket->dispose();
+  DB->dispose();
+  Config->dispose();
   return 0;
 }

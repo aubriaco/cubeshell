@@ -10,6 +10,7 @@ namespace cubeshell
   public:
     virtual MConfigVar& get(std::string path) = 0;
     virtual bool isValid() = 0;
+    virtual void dispose() = 0;
   };
 }
 

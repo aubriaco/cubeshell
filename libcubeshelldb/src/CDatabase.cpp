@@ -60,14 +60,27 @@ namespace cubeshell
     return true;
   }
 
-  basicdoc_t CDatabase::basicFind(const std::string& dbname, const std::string& collname)
+  basicdoc_t CDatabase::basicFind(const std::string& dbname, const std::string& collname, basicfilter_t filter)
   {
     basicdoc_t m;
     const bson_t *doc;
     mongoc_collection_t *collection = mongoc_client_get_collection(Client, dbname.c_str(), collname.c_str());
+    if(!collection)
+    {
+      fprintf(stdout, "Collection not found.\n");
+      return basicdoc_t();
+    }
     bson_t *query = bson_new();
+    if(filter.size() > 0)
+    {
+      for(basicfilter_t::iterator it = filter.begin(); it != filter.end(); ++it)
+      {
+        BSON_APPEND_UTF8(query, it->first.c_str(), it->second.c_str());
+      }
+    }
+
     mongoc_cursor_t *cursor = mongoc_collection_find_with_opts(collection, query, 0, 0);
-    while (mongoc_cursor_next(cursor, &doc))
+    while(mongoc_cursor_next(cursor, &doc))
     {
        std::map<std::string, std::string> a;
        char *str = bson_as_canonical_extended_json(doc, 0);
@@ -100,5 +113,10 @@ namespace cubeshell
       mongoc_client_destroy(Client);
       Client = 0;
     }
+  }
+
+  void CDatabase::dispose()
+  {
+    delete this;
   }
 }

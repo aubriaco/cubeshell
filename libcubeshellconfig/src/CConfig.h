@@ -18,6 +18,7 @@ namespace cubeshell
     ~CConfig();
     MConfigVar& get(std::string path);
     bool isValid();
+    void dispose();
   };
 }
 
