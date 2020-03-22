@@ -91,6 +91,38 @@ void* connectNode(void *param)
 {
   MNode *node = (MNode*)param;
 
+  solunet::ISocket *socket = solunet::createSocket(true);
+  socket->setSSLCertificatePassword(Config->get("certificate/password").getString().c_str());
+  socket->setSSLCertificate(Config->get("certificate/path").getString().c_str());
+  socket->setSSLPrivateKeyFile(Config->get("certificate/path").getString().c_str());
+  socket->setSSLMutual(true);
+  if(!socket->connect(node->Host.c_str(), Config->get("global/port").getInt()))
+  {
+    socket->dispose();
+    fprintf(stdout, "Failed to connect to node: %s\n", node->Name.c_str());
+    return 0;
+  }
+
+  socket->setThrowExceptions(true);
+
+  try
+  {
+    int action;
+    while(!g_Stop)
+    {
+      action = 0;
+      socket->writeBuffer(&action, 4);
+      if(action == 0)
+        socket->readBuffer(&action, 4);
+      else
+        runCommand(socket, action);
+    }
+  }
+  catch(int e)
+  {
+    fprintf(stdout, "Connector socket exception: %i\n", e);
+  }
+
   return 0;
 }
 
@@ -137,7 +169,7 @@ void scanNodes()
       }
       else
       {
-        fprintf(stdout, "\n");
+        fprintf(stdout, "Creating node connect thread...\n");
         pthread_create(&threadId, &attr, connectNode, node);
       }
       Nodes.push_back(node);
