@@ -3,7 +3,7 @@
 #include "MContainer.h"
 #include <solunet.h>
 
-int deploy(MContainer& container);
-int usage(solunet::ISocket *socket);
+void nodeCommand_send(solunet::ISocket *socket, int action);
+void nodeCommand_recv(solunet::ISocket *socket, int action);
 
 #endif

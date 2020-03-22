@@ -7,6 +7,8 @@
 #include "MNode.h"
 #include "MContainer.h"
 #include "cli_server.h"
+#include "commands.h"
+#include "machineres.h"
 #include <queue>
 
 using namespace cubeshell;
@@ -32,6 +34,8 @@ std::queue<MContainer>& getContainerQueue()
   return ContainerQueue;
 }
 
+
+
 void interruptCallback(int sig)
 {
   printf("Interrupt signal called.\n");
@@ -43,10 +47,6 @@ void interruptCallback(int sig)
   socket->dispose();
 }
 
-void nodeCommand(solunet::ISocket *socket, int action)
-{
-
-}
 
 void* node(void *param)
 {
@@ -63,12 +63,13 @@ void* node(void *param)
 
       if(action == 0)
       {
-        socket->writeBuffer(&action, 4);
+        MUsage usage = getUsage();
+        socket->writeBuffer(&usage, sizeof(MUsage));
       }
       else
-        nodeCommand(socket, action);
+        nodeCommand_recv(socket, action);
 
-      sleep(5);
+      sleep(15);
     }
   }
   catch(int e)
@@ -111,11 +112,16 @@ void* connectNode(void *param)
     while(!g_Stop)
     {
       action = 0;
+
       socket->writeBuffer(&action, 4);
       if(action == 0)
-        socket->readBuffer(&action, 4);
+      {
+        MUsage usage;
+        socket->readBuffer(&usage, sizeof(MUsage));
+        fprintf(stdout, "Usage reported [MEM: %f]\n", usage.MemUsage);
+      }
       else
-        nodeCommand(socket, action);
+        nodeCommand_send(socket, action);
     }
   }
   catch(int e)

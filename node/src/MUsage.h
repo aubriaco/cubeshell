@@ -3,6 +3,7 @@
 
 struct MUsage
 {
+  bool Set = false;
   double MemUsage, MemRSS;
 };
 
