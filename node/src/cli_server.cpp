@@ -38,6 +38,11 @@ int cli_cmd(IDatabase *db, std::string s)
 
   fprintf(stdout, "Param count: %lu\n", p.size());
 
+  if(p[0] == "deploy")
+  {
+    
+  }
+
   return -1;
 }
 

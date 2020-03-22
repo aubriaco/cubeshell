@@ -5,14 +5,17 @@
 #include <cubeshellconfig.h>
 #include <rapidjson/document.h>
 #include "MNode.h"
+#include "MContainer.h"
 #include "cli_server.h"
+#include <queue>
 
 using namespace cubeshell;
 
 static bool g_Stop = false;
 static IConfig *Config = 0;
 static IDatabase *DB = 0;
-static std::vector<MNode> Nodes;
+static std::vector<MNode*> Nodes;
+static std::queue<MContainer> ContainerQueue;
 
 bool isStopped()
 {
@@ -22,6 +25,11 @@ bool isStopped()
 IConfig *getConfig()
 {
   return Config;
+}
+
+std::queue<MContainer>& getContainerQueue()
+{
+  return ContainerQueue;
 }
 
 void interruptCallback(int sig)
@@ -35,6 +43,11 @@ void interruptCallback(int sig)
   socket->dispose();
 }
 
+void nodeCommand(solunet::ISocket *socket, int action)
+{
+
+}
+
 void* node(void *param)
 {
   fprintf(stdout, "Node connection.\n");
@@ -45,8 +58,17 @@ void* node(void *param)
     while(!g_Stop)
     {
       int action = 0;
-      socket->writeBuffer(&action, 4);
+
       socket->readBuffer(&action, 4);
+
+      if(action == 0)
+      {
+        socket->writeBuffer(&action, 4);
+      }
+      else
+        nodeCommand(socket, action);
+
+      sleep(5);
     }
   }
   catch(int e)
@@ -65,23 +87,61 @@ void configure()
   DB->setConnectionString(Config->get("db/connection_string").getString());
 }
 
+void* connectNode(void *param)
+{
+  MNode *node = (MNode*)param;
+
+  return 0;
+}
+
+MNode *findNodeByName(const std::string &name)
+{
+  for(std::vector<MNode*>::iterator it = Nodes.begin(); it != Nodes.end(); ++it)
+  {
+    if((*it)->Name == name)
+    {
+      return (*it);
+    }
+  }
+  return 0;
+}
+
 void scanNodes()
 {
   fprintf(stdout, "Scanning nodes...\n");
+  pthread_attr_t attr;
+  pthread_attr_init(&attr);
+  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+  pthread_t threadId = 0;
+
   DB->open();
   basicdoc_t doc = DB->basicFind("cubeshell", "nodes");
   for(basicdoc_t::iterator it = doc.begin(); it != doc.end(); ++it)
   {
-    MNode node;
-    node.Name = (*it)["name"];
-    node.Host = (*it)["host"];
-    fprintf(stdout, "Found Node: %s | Host: %s\n", node.Name.c_str(), node.Host.c_str());
-    if(node.Name == Config->get("name").getString())
+    MNode *node = new MNode();
+    node->Name = (*it)["name"];
+    node->Host = (*it)["host"];
+    fprintf(stdout, "Found Node: %s | Host: %s ... ", node->Name.c_str(), node->Host.c_str());
+    if(findNodeByName(node->Name))
     {
-      node.Self = true;
-      fprintf(stdout, "Thats me!\n");
+      fprintf(stdout, "Exists\n");
+      delete node;
     }
-    Nodes.push_back(node);
+    else
+    {
+      if(node->Name == Config->get("name").getString())
+      {
+        node->Self = true;
+        fprintf(stdout, "Thats me!\n");
+      }
+      else
+      {
+        fprintf(stdout, "\n");
+        pthread_create(&threadId, &attr, connectNode, node);
+      }
+      Nodes.push_back(node);
+    }
   }
   DB->close();
 }
@@ -133,6 +193,11 @@ int main(int argc, char *argv[])
   {
     solunet::ISocket *s = socket->accept();
     pthread_create(&threadId, &attr, node, s);
+  }
+
+  for(std::vector<MNode*>::iterator it = Nodes.begin(); it != Nodes.end(); ++it)
+  {
+    delete (*it);
   }
 
   socket->dispose();
