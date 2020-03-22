@@ -115,7 +115,7 @@ void* connectNode(void *param)
       if(action == 0)
         socket->readBuffer(&action, 4);
       else
-        runCommand(socket, action);
+        nodeCommand(socket, action);
     }
   }
   catch(int e)
