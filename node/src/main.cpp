@@ -69,7 +69,7 @@ void* node(void *param)
       else
         nodeCommand_recv(socket, action);
 
-      sleep(15);
+      //sleep(15);
     }
   }
   catch(int e)
@@ -111,8 +111,8 @@ void* connectNode(void *param)
     int action;
     while(!g_Stop)
     {
-      action = 0;
 
+      action = 0;
       socket->writeBuffer(&action, 4);
       if(action == 0)
       {
@@ -122,6 +122,8 @@ void* connectNode(void *param)
       }
       else
         nodeCommand_send(socket, action);
+
+      sleep(15);
     }
   }
   catch(int e)
@@ -185,6 +187,26 @@ void scanNodes()
 }
 
 
+void *loop(void * param)
+{
+  while(!g_Stop)
+  {
+    if(getContainerQueue().size() > 0)
+    {
+      MContainer container = getContainerQueue().front();
+      FILE *p = popen(std::string("docker run -it --rm --name=\"" + container.Namespace + "/" + container.Name + "\" " + container.ImageName).c_str(), "r");
+      if(p)
+      {
+        pclose(p);
+        fprintf(stdout, "Deployed %s/%s: %s\n", container.Namespace.c_str(), container.Name.c_str(), container.ImageName.c_str());
+        getContainerQueue().pop();
+      }
+    }
+    sleep(5);
+  }
+  return 0;
+}
+
 int main(int argc, char *argv[])
 {
   fprintf(stdout, "=======================================================\n");
@@ -226,6 +248,7 @@ int main(int argc, char *argv[])
   pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
   pthread_t threadId = 0;
+  pthread_create(&threadId, &attr, loop, 0);
   pthread_create(&threadId, &attr, cli_listener, 0);
   while(!g_Stop)
   {

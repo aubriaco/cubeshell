@@ -40,12 +40,14 @@ int cli_cmd(IDatabase *db, std::string s)
 
   if(p[0] == "deploy")
   {
-    if(p.size() >= 3)
+    if(p.size() >= 4)
     {
       MContainer container;
-      container.Name = p[1];
-      container.ImageName = p[2];
+      container.Namespace = p[1];
+      container.Name = p[2];
+      container.ImageName = p[3];
       getContainerQueue().push(container);
+      fprintf(stdout, "Set for deploy: %s/%s\n", container.Namespace.c_str(), container.Name.c_str());
       return 0;
     }
     else
