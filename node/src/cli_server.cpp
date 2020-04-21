@@ -28,7 +28,7 @@ int cli_cmd(IDatabase *db, std::string s)
   std::vector<std::string> p;
 
   size_t n = 0;
-  while((n = s.find(" ")) != std::string::npos)
+  while(s.size() > 0 && (n = s.find(" ")) != std::string::npos)
   {
     std::string i = s.substr(0, n);
     s = s.substr(n+1);
@@ -68,7 +68,7 @@ std::string readLString(solunet::ISocket *socket)
     fprintf(stderr, "Length of command too long...\n");
     throw 99;
   }
-  char *buf = new char[len];
+  char *buf = new char[len+1];
   size_t r = socket->readBuffer(buf, len);
   buf[r] = 0;
   std::string s(buf);

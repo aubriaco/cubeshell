@@ -194,13 +194,12 @@ void *loop(void * param)
     if(getContainerQueue().size() > 0)
     {
       MContainer container = getContainerQueue().front();
-      FILE *p = popen(std::string("docker run -it --rm --name=\"" + container.Namespace + "/" + container.Name + "\" " + container.ImageName).c_str(), "r");
-      if(p)
+      fprintf(stdout, "Deploying %s/%s: %s\n", container.Namespace.c_str(), container.Name.c_str(), container.ImageName.c_str());
+      if(system(std::string("docker run -d --rm --name=\"" + container.Namespace + "." + container.Name + "\" " + container.ImageName).c_str()) == 0)
       {
-        pclose(p);
         fprintf(stdout, "Deployed %s/%s: %s\n", container.Namespace.c_str(), container.Name.c_str(), container.ImageName.c_str());
-        getContainerQueue().pop();
       }
+      getContainerQueue().pop();
     }
     sleep(5);
   }
